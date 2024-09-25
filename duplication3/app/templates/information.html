@@ -1,0 +1,44 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Basic Animal Care Information</h1>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <div class="box p-3 mb-3">
+                <img src="{{ url_for('static', filename='assets/brushing_dog.jpg') }}" alt="Image 1" class="img-fluid mb-3" height="30%" width="40%">
+                <h4><bold>Grooming</bold></h4>
+                <p>Grooming your animals can provide many benefits. Some of the benefits include improving appearance and the opportunity for bonding between the owner and the animal.</p>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="box p-3 mb-3">
+                <img src="{{ url_for('static', filename='assets/cat_playing.jpg') }}" alt="Image 2" class="img-fluid mb-3">
+                <h4><bold>Exercise</bold></h4>
+                <p>It is important to exercise your animals for many reasons. Exercising your animal can stimulate their mind while keeping them healthy.</p>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="box p-3 mb-3">
+                <img src="{{ url_for('static', filename='assets/dog_house.jpg') }}" alt="Image 3" class="img-fluid mb-3">
+                <h4><bold>Housing</bold></h4>
+                <p>We understand here, at Grace's Animal Services, that animals need a stable housing environment. It is important to us to keep your dog feeling at home while they board with us. Having a stable housing environment for your animal keeps them stress-free and less anxious.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .box {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+    }
+</style>
+
+
+
+
+{% endblock %}
