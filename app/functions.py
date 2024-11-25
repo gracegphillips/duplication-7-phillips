@@ -17,3 +17,18 @@ def filter_by_price(properties, min_price=None, max_price=None):
         filtered_properties.append(property)
 
     return filtered_properties
+
+def filter_by_name(clients, name=None):
+    """
+    Filters a list of clients based on name.
+
+    :param clients: List of clients (each client is a dictionary)
+    :param name: Name to filter by (optional)
+    :return: List of clients that match the criteria
+    """
+    if not name:
+        return clients
+
+    filtered_clients = [client for client in clients if name.lower() in client['name'].lower()]
+    return filtered_clients
+

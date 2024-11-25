@@ -2,6 +2,15 @@
 
 {% block content %}
     <h1>Clients Data</h1>
+
+    <form method="post" class="mb-4">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name">
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
     <div class="container mt-4">
         <a class="btn btn-primary mb-3" href="{{ url_for('clients.add_client_data') }}">Add New Client Data</a>
         <table id="data-table" class="display table table-striped table-bordered" width="100%">

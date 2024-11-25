@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.db_connect import get_db
 import pandas as pd
+from ..functions import filter_by_name
 
 
 clients = Blueprint('clients', __name__)
 
-@clients.route('/show_clients')
+
+@clients.route('/show_clients', methods=['GET', 'POST'])
 def show_clients():
     connection = get_db()
     query = """
@@ -16,6 +18,12 @@ def show_clients():
         cursor.execute(query)
         result = cursor.fetchall()
     df = pd.DataFrame(result, columns=['client_id', 'name', 'email', 'phone'])
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        filtered_clients = filter_by_name(result, name=name)
+        df = pd.DataFrame(filtered_clients, columns=['client_id', 'name', 'email', 'phone'])
+
     df['Actions'] = df['client_id'].apply(lambda id:
       f'<a href="{url_for("clients.edit_client_data", client_id=id)}" class="btn btn-sm btn-info">Edit</a> '
       f'<form action="{url_for("clients.delete_client_data", client_id=id)}" method="post" style="display:inline;">'
