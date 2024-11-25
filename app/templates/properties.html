@@ -3,6 +3,37 @@
 
 {% block content %}
     <h1>Properties Data</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label for="min_size">Min Size (sq ft)</label>
+        <input type="number" class="form-control" id="min_size" name="min_size">
+    </div>
+    <div class="form-group">
+        <label for="max_size">Max Size (sq ft)</label>
+        <input type="number" class="form-control" id="max_size" name="max_size">
+    </div>
+    <div class="form-group">
+        <label for="min_price">Min Price</label>
+        <input type="number" class="form-control" id="min_price" name="min_price">
+    </div>
+    <div class="form-group">
+        <label for="max_price">Max Price</label>
+        <input type="number" class="form-control" id="max_price" name="max_price">
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<div class="mt-4">
+    <h2>Filtered Properties</h2>
+    <ul>
+        {% for property in properties %}
+            <li>{{ property.city }} - ${{ property.price }} - {{ property.house_size }} sq ft</li>
+        {% endfor %}
+    </ul>
+</div>
+
+
     <div class="container mt-4">
         <a class="btn btn-primary mb-3" href="{{ url_for('properties.add_property_data') }}">Add New Property Data</a>
         <table id="data-table" class="display table table-striped table-bordered" width="100%">
@@ -43,4 +74,5 @@
             });
         });
     </script>
+
 {% endblock %}

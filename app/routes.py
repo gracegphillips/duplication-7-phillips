@@ -16,3 +16,7 @@ def clients():
 @app.route('/properties')
 def properties():
     return render_template('properties.html')
+
+@app.route('/visuals')
+def visuals():
+    return render_template('visuals.html')
