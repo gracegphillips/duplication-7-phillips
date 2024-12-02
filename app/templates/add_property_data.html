@@ -1,4 +1,4 @@
-<!-- add_property_data.html -->
+<<!-- add_property_data.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -7,7 +7,12 @@
         <form method="POST" action="{{ url_for('properties.add_property_data') }}">
             <div class="mb-3">
                 <label for="client_id" class="form-label">Client ID</label>
-                <input type="number" class="form-control" id="client_id" name="client_id" required>
+                <select class="form-control" id="client_id" name="client_id" required>
+                    <option value="">Select a client ID</option>
+                    {% for client_id in client_ids %}
+                        <option value="{{ client_id }}">{{ client_id }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="mb-3">
                 <label for="address" class="form-label">Address</label>

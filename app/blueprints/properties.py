@@ -24,6 +24,12 @@ def show_properties():
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
+    # Retrieve list of client IDs
+    query = "SELECT client_id FROM clients"
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        client_ids = [row['client_id'] for row in cursor.fetchall()]
+
     if request.method == 'POST':
         min_price = request.form.get('min_price', type=int)
         max_price = request.form.get('max_price', type=int)
@@ -42,10 +48,11 @@ def show_properties():
         table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
         rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
-    return render_template("properties.html", table=rows_only)
+    return render_template("properties.html", table=rows_only, client_ids=client_ids)
 
 @properties.route('/add_property_data', methods=['GET', 'POST'])
 def add_property_data():
+    connection = get_db()
     if request.method == 'POST':
         client_id = request.form['client_id']
         address = request.form['address']
@@ -57,7 +64,6 @@ def add_property_data():
         price = request.form['price']
         shown_date = request.form['shown_date']
 
-        connection = get_db()
         query = "INSERT INTO properties_shown (client_id, address, city, state, zip_code, property_type, house_size, price, shown_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         with connection.cursor() as cursor:
             cursor.execute(query, (client_id, address, city, state, zip_code, property_type, house_size, price, shown_date))
@@ -65,7 +71,15 @@ def add_property_data():
         flash("New property data added successfully!", "success")
         return redirect(url_for('properties.show_properties'))
 
-    return render_template("add_property_data.html")
+    # Retrieve list of client IDs
+    query = "SELECT client_id FROM clients"
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        client_ids = [row['client_id'] for row in cursor.fetchall()]
+
+    return render_template("add_property_data.html", client_ids=client_ids)
+
+
 
 @properties.route('/edit_property_data/<int:property_id>', methods=['GET', 'POST'])
 def edit_property_data(property_id):

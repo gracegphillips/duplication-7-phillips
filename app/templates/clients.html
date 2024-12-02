@@ -3,16 +3,32 @@
 {% block content %}
     <h1>Clients Data</h1>
 
-    <form method="post" class="mb-4">
-    <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name">
+  <div class="card mb-4">
+        <div class="card-header">
+            <h5>Filter Clients</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Name</label>
+                        <select class="form-control" id="name" name="name">
+                            <option value="">Select a client</option>
+                            {% for client_name in client_names %}
+                            <option value="{{ client_name }}">{{ client_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Filter</button>
-</form>
 
     <div class="container mt-4">
-        <a class="btn btn-primary mb-3" href="{{ url_for('clients.add_client_data') }}">Add New Client Data</a>
+        <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addClientModal">
+            Add New Client
+        </button>
         <table id="data-table" class="display table table-striped table-bordered" width="100%">
             <thead>
                 <tr>
@@ -27,6 +43,40 @@
                 {{ table | safe }}
             </tbody>
         </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addClientModal" tabindex="-1" role="dialog" aria-labelledby="addClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addClientModalLabel">Add New Client</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="{{ url_for('clients.add_client_data') }}">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" class="form-control" id="phone" name="phone" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Client</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">

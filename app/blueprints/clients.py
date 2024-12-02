@@ -19,6 +19,9 @@ def show_clients():
         result = cursor.fetchall()
     df = pd.DataFrame(result, columns=['client_id', 'name', 'email', 'phone'])
 
+    # Retrieve list of client names
+    client_names = df['name'].tolist()
+
     if request.method == 'POST':
         name = request.form.get('name')
         filtered_clients = filter_by_name(result, name=name)
@@ -32,7 +35,7 @@ def show_clients():
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
-    return render_template("clients.html", table=rows_only)
+    return render_template("clients.html", table=rows_only, client_names=client_names)
 
 @clients.route('/add_client_data', methods=['GET', 'POST'])
 def add_client_data():

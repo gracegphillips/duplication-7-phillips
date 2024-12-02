@@ -42,6 +42,10 @@
                 <label for="price" class="form-label">Price</label>
                 <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ property_data.price }}">
             </div>
+            <div class="mb-3">
+                <label for="shown_date" class="form-label">Shown Date</label>
+                <input type="date" class="form-control" id="shown_date" name="shown_date" value="{{ property_data.shown_date }}">
+            </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
