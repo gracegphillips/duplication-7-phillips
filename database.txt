@@ -1,0 +1,40 @@
+DATABASE STRUCTURE
+
+1. **clients** Table
+   - **Description**: This table stores client information.
+   - **Columns**:
+     - `client_id` (INT) - Primary key, auto-incremented. Unique identifier for each client.
+     - `name` (VARCHAR(100)) - Client's full name. Cannot be NULL.
+     - `email` (VARCHAR(100)) - Client's email address.
+     - `phone` (VARCHAR(15)) - Client's phone number.
+   - **Primary Key**: `client_id`
+
+2. **properties_shown** Table
+   - **Description**: This table stores information about properties shown to clients.
+   - **Columns**:
+     - `property_id` (INT) - Primary key, auto-incremented. Unique identifier for each property.
+     - `client_id` (INT) - Foreign key that links to the `client_id` from the `clients` table.
+     - `address` (VARCHAR(255)) - Address of the property. Cannot be NULL.
+     - `city` (VARCHAR(100)) - City where the property is located.
+     - `state` (VARCHAR(50)) - State where the property is located.
+     - `zip_code` (VARCHAR(10)) - Zip code for the property address.
+     - `property_type` (ENUM) - Type of the property. Can be 'House', 'Apartment', 'Commercial', or 'Land'. Cannot be NULL.
+     - `house_size` (INT) - Size of the property in square feet.
+     - `price` (DECIMAL(15, 2)) - Price of the property.
+     - `shown_date` (DATE) - Date when the property was shown to the client.
+   - **Primary Key**: `property_id`
+   - **Foreign Key**: `client_id` references `client_id` in the `clients` table.
+     - **ON DELETE CASCADE**: If a client is deleted, all related properties in `properties_shown` will also be deleted.
+     - **ON UPDATE CASCADE**: If a `client_id` is updated in the `clients` table, the `client_id` in `properties_shown` will automatically update.
+
+---
+
+RELATIONSHIPS:
+
+- **One-to-Many Relationship** between `clients` and `properties_shown`:
+   - One client can have multiple properties shown to them.
+   - The relationship is established via the foreign key `client_id` in the `properties_shown` table, which references the `client_id` in the `clients` table.
+   - **Cascade Options**:
+     - **ON DELETE CASCADE**: If a client is deleted, all the properties shown to that client will also be deleted.
+     - **ON UPDATE CASCADE**: If a client's `client_id` is updated, the related `client_id` in `properties_shown` will automatically update.
+

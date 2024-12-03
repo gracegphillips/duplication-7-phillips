@@ -28,10 +28,10 @@
             <div class="mb-3">
                 <label for="property_type" class="form-label">Property Type</label>
                 <select class="form-control" id="property_type" name="property_type" required>
-                    <option value="House" {% if property_data.property_type == 'House' %}selected{% endif %}>House</option>
-                    <option value="Apartment" {% if property_data.property_type == 'Apartment' %}selected{% endif %}>Apartment</option>
-                    <option value="Commercial" {% if property_data.property_type == 'Commercial' %}selected{% endif %}>Commercial</option>
-                    <option value="Land" {% if property_data.property_type == 'Land' %}selected{% endif %}>Land</option>
+                    <option value="House" {% if property_data.property_type =='House' %}selected{% endif %}>House</option>
+                    <option value="Apartment" {% if property_data.property_type =='Apartment' %}selected{% endif %}>Apartment</option>
+                    <option value="Commercial" {% if property_data.property_type =='Commercial' %}selected{% endif %}>Commercial</option>
+                    <option value="Land" {% if property_data.property_type =='Land' %}selected{% endif %}>Land</option>
                 </select>
             </div>
             <div class="mb-3">
