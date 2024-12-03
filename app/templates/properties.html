@@ -27,6 +27,35 @@
                         <input type="number" class="form-control" id="max_price" name="max_price">
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="filter-client-id">Client ID</label>
+                        <select class="form-control" id="filter-client-id" name="client_id">
+                            <option value="">Select a client ID</option>
+                            {% for client_id in client_ids %}
+                            <option value="{{ client_id }}">{{ client_id }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="filter-city">City</label>
+                        <select class="form-control" id="filter-city" name="city">
+                            <option value="">Select a city</option>
+                            {% for city in cities %}
+                            <option value="{{ city }}">{{ city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="filter-state">State</label>
+                        <select class="form-control" id="filter-state" name="state">
+                            <option value="">Select a state</option>
+                            {% for state in states %}
+                            <option value="{{ state }}">{{ state }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary">Filter</button>
             </form>
         </div>
@@ -75,7 +104,7 @@
                             <select class="form-control" id="client_id" name="client_id" required>
                                 <option value="">Select a client ID</option>
                                 {% for client_id in client_ids %}
-                                    <option value="{{ client_id }}">{{ client_id }}</option>
+                                <option value="{{ client_id }}">{{ client_id }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -126,19 +155,123 @@
         </div>
     </div>
 
+
+
+<!-- Edit Property Modal -->
+<div class="modal fade" id="editPropertyModal" tabindex="-1" role="dialog" aria-labelledby="editPropertyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPropertyModalLabel">Edit Property</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-property-form">
+                    <input type="hidden" id="edit-property-id" name="property_id">
+                    <div class="form-group">
+                        <label for="edit-client-id">Client ID</label>
+                        <select class="form-control" id="edit-client-id" name="client_id" required>
+                            <option value="">Select a client ID</option>
+                            {% for client_id in client_ids %}
+                            <option value="{{ client_id }}">{{ client_id }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-address">Address</label>
+                        <input type="text" class="form-control" id="edit-address" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-city">City</label>
+                        <select class="form-control" id="edit-city" name="city">
+                            <option value="">Select a city</option>
+                            {% for city in cities %}
+                            <option value="{{ city }}">{{ city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-state">State</label>
+                        <select class="form-control" id="edit-state" name="state">
+                            <option value="">Select a state</option>
+                            {% for state in states %}
+                            <option value="{{ state }}">{{ state }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-zip-code">Zip Code</label>
+                        <input type="text" class="form-control" id="edit-zip-code" name="zip_code">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-property-type">Property Type</label>
+                        <select class="form-control" id="edit-property-type" name="property_type" required>
+                            <option value="House">House</option>
+                            <option value="Apartment">Apartment</option>
+                            <option value="Commercial">Commercial</option>
+                            <option value="Land">Land</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-house-size">House Size (sq ft)</label>
+                        <input type="number" class="form-control" id="edit-house-size" name="house_size">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-price">Price</label>
+                        <input type="number" class="form-control" id="edit-price" name="price">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-shown-date">Shown Date</label>
+                        <input type="date" class="form-control" id="edit-shown-date" name="shown_date">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 {% endblock %}
 
 {% block scripts %}
-    <!-- Include DataTables JavaScript -->
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#data-table').DataTable({
-                "paging": true,
-                "ordering": true,
-                "info": true,
-                "searching": true
+            $('#editPropertyModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var propertyId = button.data('property-id');
+                var clientId = button.data('client-id');
+                var address = button.data('address');
+                var city = button.data('city');
+                var state = button.data('state');
+                var zipCode = button.data('zip-code');
+                var propertyType = button.data('property-type');
+                var houseSize = button.data('house-size');
+                var price = button.data('price');
+                var shownDate = button.data('shown-date');
+
+                var modal = $(this);
+                modal.find('#edit-property-id').val(propertyId);
+                modal.find('#edit-client-id').val(clientId);
+                modal.find('#edit-address').val(address);
+                modal.find('#edit-city').val(city);
+                modal.find('#edit-state').val(state);
+                modal.find('#edit-zip-code').val(zipCode);
+                modal.find('#edit-property-type').val(propertyType);
+                modal.find('#edit-house-size').val(houseSize);
+                modal.find('#edit-price').val(price);
+                modal.find('#edit-shown-date').val(shownDate);
+            });
+
+            $('#edit-property-form').on('submit', function(event) {
+                event.preventDefault();
+                // Add your form submission logic here
+                $('#editPropertyModal').modal('hide');
             });
         });
     </script>

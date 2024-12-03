@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.db_connect import get_db
 import pandas as pd
-from ..functions import filter_by_price
+from ..functions import filter_properties
+
 
 properties = Blueprint('properties', __name__)
 
@@ -16,39 +17,33 @@ def show_properties():
         cursor.execute(query)
         result = cursor.fetchall()
     df = pd.DataFrame(result, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date'])
+
+    # Retrieve list of client IDs, cities, and states
+    client_ids = df['client_id'].unique().tolist()
+    cities = df['city'].unique().tolist()
+    states = df['state'].unique().tolist()
+
+    if request.method == 'POST':
+        min_size = request.form.get('min_size')
+        max_size = request.form.get('max_size')
+        min_price = request.form.get('min_price')
+        max_price = request.form.get('max_price')
+        client_id = request.form.get('client_id')
+        city = request.form.get('city')
+        state = request.form.get('state')
+
+        filtered_properties = filter_properties(result, min_size=min_size, max_size=max_size, min_price=min_price, max_price=max_price, client_id=client_id, city=city, state=state)
+        df = pd.DataFrame(filtered_properties, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date'])
+
     df['Actions'] = df['property_id'].apply(lambda id:
-      f'<a href="{url_for("properties.edit_property_data", property_id=id)}" class="btn btn-sm btn-info">Edit</a> '
-      f'<form action="{url_for("properties.delete_property_data", property_id=id)}" method="post" style="display:inline;">'
-      f'<button type="submit" class="btn btn-sm btn-danger">Delete</button></form>'
-      )
+        f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editPropertyModal" data-property-id="{id}">Edit</button> '
+        f'<form action="{url_for("properties.delete_property_data", property_id=id)}" method="post" style="display:inline;">'
+        f'<button type="submit" class="btn btn-sm btn-danger">Delete</button></form>'
+    )
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
-    # Retrieve list of client IDs
-    query = "SELECT client_id FROM clients"
-    with connection.cursor() as cursor:
-        cursor.execute(query)
-        client_ids = [row['client_id'] for row in cursor.fetchall()]
-
-    if request.method == 'POST':
-        min_price = request.form.get('min_price', type=int)
-        max_price = request.form.get('max_price', type=int)
-
-        filtered_properties = filter_by_price(
-            result,
-            min_price=min_price,
-            max_price=max_price
-        )
-        df = pd.DataFrame(filtered_properties, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date'])
-        df['Actions'] = df['property_id'].apply(lambda id:
-          f'<a href="{url_for("properties.edit_property_data", property_id=id)}" class="btn btn-sm btn-info">Edit</a> '
-          f'<form action="{url_for("properties.delete_property_data", property_id=id)}" method="post" style="display:inline;">'
-          f'<button type="submit" class="btn btn-sm btn-danger">Delete</button></form>'
-          )
-        table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
-        rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
-
-    return render_template("properties.html", table=rows_only, client_ids=client_ids)
+    return render_template("properties.html", table=rows_only, client_ids=client_ids, cities=cities, states=states)
 
 @properties.route('/add_property_data', methods=['GET', 'POST'])
 def add_property_data():

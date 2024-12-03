@@ -19,23 +19,29 @@ def show_clients():
         result = cursor.fetchall()
     df = pd.DataFrame(result, columns=['client_id', 'name', 'email', 'phone'])
 
-    # Retrieve list of client names
+    # Retrieve list of client names, emails, and phones
     client_names = df['name'].tolist()
+    client_emails = df['email'].tolist()
+    client_phones = df['phone'].tolist()
 
     if request.method == 'POST':
         name = request.form.get('name')
-        filtered_clients = filter_by_name(result, name=name)
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        filtered_clients = filter_by_name(result, name=name, email=email, phone=phone)
         df = pd.DataFrame(filtered_clients, columns=['client_id', 'name', 'email', 'phone'])
 
     df['Actions'] = df['client_id'].apply(lambda id:
-      f'<a href="{url_for("clients.edit_client_data", client_id=id)}" class="btn btn-sm btn-info">Edit</a> '
-      f'<form action="{url_for("clients.delete_client_data", client_id=id)}" method="post" style="display:inline;">'
-      f'<button type="submit" class="btn btn-sm btn-danger">Delete</button></form>'
-      )
+        f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editClientModal" data-client-id="{id}" data-client-name="{df.loc[df["client_id"] == id, "name"].values[0]}" data-client-email="{df.loc[df["client_id"] == id, "email"].values[0]}" data-client-phone="{df.loc[df["client_id"] == id, "phone"].values[0]}">Edit</button> '
+        f'<form action="{url_for("clients.delete_client_data", client_id=id)}" method="post" style="display:inline;">'
+        f'<button type="submit" class="btn btn-sm btn-danger">Delete</button></form>'
+    )
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
-    return render_template("clients.html", table=rows_only, client_names=client_names)
+    return render_template("clients.html", table=rows_only, client_names=client_names, client_emails=client_emails, client_phones=client_phones)
+
+
 
 @clients.route('/add_client_data', methods=['GET', 'POST'])
 def add_client_data():
@@ -55,27 +61,20 @@ def add_client_data():
     return render_template("add_client_data.html")
 
 
-@clients.route('/edit_client_data/<int:client_id>', methods=['GET', 'POST'])
-def edit_client_data(client_id):
+@clients.route('/edit_client_data', methods=['POST'])
+def edit_client_data():
+    client_id = request.form['client_id']
+    name = request.form['name']
+    email = request.form['email']
+    phone = request.form['phone']
+
     connection = get_db()
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        phone = request.form['phone']
-
-        query = "UPDATE clients SET name = %s, email = %s, phone = %s WHERE client_id = %s"
-        with connection.cursor() as cursor:
-            cursor.execute(query, (name, email, phone, client_id))
-        connection.commit()
-        flash("Client data updated successfully!", "success")
-        return redirect(url_for('clients.show_clients'))
-
-    query = "SELECT * FROM clients WHERE client_id = %s"
+    query = "UPDATE clients SET name = %s, email = %s, phone = %s WHERE client_id = %s"
     with connection.cursor() as cursor:
-        cursor.execute(query, (client_id,))
-        client_data = cursor.fetchone()
-
-    return render_template("edit_client_data.html", client_data=client_data)
+        cursor.execute(query, (name, email, phone, client_id))
+    connection.commit()
+    flash("Client data updated successfully!", "success")
+    return redirect(url_for('clients.show_clients'))
 
 @clients.route('/delete_client_data/<int:client_id>', methods=['POST'])
 def delete_client_data(client_id):
@@ -86,3 +85,5 @@ def delete_client_data(client_id):
     connection.commit()
     flash("Client data deleted successfully!", "success")
     return redirect(url_for('clients.show_clients'))
+
+
