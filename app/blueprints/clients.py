@@ -75,7 +75,6 @@ def edit_client_data():
     flash("Client data updated successfully!", "success")
     return redirect(url_for('clients.show_clients'))
 
-
 @clients.route('/delete_client_data/<int:client_id>', methods=['POST'])
 def delete_client_data(client_id):
     connection = get_db()

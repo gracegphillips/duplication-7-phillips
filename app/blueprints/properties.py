@@ -6,20 +6,23 @@ from ..functions import filter_properties
 
 properties = Blueprint('properties', __name__)
 
+
 @properties.route('/show_properties', methods=['GET', 'POST'])
 def show_properties():
     connection = get_db()
     query = """
-    SELECT property_id, client_id, address, city, state, zip_code, property_type, house_size, price, shown_date
-    FROM properties_shown
+    SELECT p.property_id, p.client_id, p.address, p.city, p.state, p.zip_code, p.property_type, p.house_size, p.price, p.shown_date, c.name AS client_name
+    FROM properties_shown p
+    JOIN clients c ON p.client_id = c.client_id
     """
     with connection.cursor() as cursor:
         cursor.execute(query)
         result = cursor.fetchall()
-    df = pd.DataFrame(result, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date'])
+    df = pd.DataFrame(result, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date', 'client_name'])
 
     # Retrieve list of client IDs, cities, and states
     client_ids = df['client_id'].unique().tolist()
+    client_names = {row['client_id']: row['client_name'] for row in result}
     cities = df['city'].unique().tolist()
     states = df['state'].unique().tolist()
 
@@ -32,17 +35,24 @@ def show_properties():
         city = request.form.get('city')
         state = request.form.get('state')
 
-        filtered_properties = filter_properties(result, min_size=min_size, max_size=max_size, min_price=min_price, max_price=max_price, client_id=client_id, city=city, state=state)
-        df = pd.DataFrame(filtered_properties, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date'])
+        # Convert empty strings to None
+        min_size = int(min_size) if min_size else None
+        max_size = int(max_size) if max_size else None
+        min_price = float(min_price) if min_price else None
+        max_price = float(max_price) if max_price else None
+        client_id = int(client_id) if client_id else None
 
-    df['Actions'] = df['property_id'].apply(lambda id:
-    f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editPropertyModal" data-property-id="{id}">Edit</button> '
-    f'<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deletePropertyModal" data-property-id="{id}">Delete</button>'
-)
+        filtered_properties = filter_properties(result, min_size=min_size, max_size=max_size, min_price=min_price, max_price=max_price, client_id=client_id, city=city, state=state)
+        df = pd.DataFrame(filtered_properties, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date', 'client_name'])
+
+    df['Actions'] = df.apply(lambda row:
+        f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editPropertyModal" data-property-id="{row["property_id"]}" data-client-id="{row["client_id"]}" data-client-name="{row["client_name"]}" data-address="{row["address"]}" data-city="{row["city"]}" data-state="{row["state"]}" data-zip-code="{row["zip_code"]}" data-property-type="{row["property_type"]}" data-house-size="{row["house_size"]}" data-price="{row["price"]}" data-shown-date="{row["shown_date"]}">Edit</button> '
+        f'<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deletePropertyModal" data-property-id="{row["property_id"]}">Delete</button>', axis=1
+    )
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
-    return render_template("properties.html", table=rows_only, client_ids=client_ids, cities=cities, states=states)
+    return render_template("properties.html", table=rows_only, client_ids=client_ids, client_names=client_names, cities=cities, states=states)
 
 @properties.route('/add_property_data', methods=['GET', 'POST'])
 def add_property_data():

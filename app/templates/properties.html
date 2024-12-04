@@ -78,6 +78,7 @@
                     <th>House Size (sq ft)</th>
                     <th>Price</th>
                     <th>Shown Date</th>
+                    <th>Client Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -168,16 +169,19 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="edit-property-form">
+                <form id="edit-property-form" method="POST" action="">
                     <input type="hidden" id="edit-property-id" name="property_id">
                     <div class="form-group">
-                        <label for="edit-client-id">Client ID</label>
+                        <label for="edit-client-id">Client</label>
                         <select class="form-control" id="edit-client-id" name="client_id" required>
-                            <option value="">Select a client ID</option>
-                            {% for client_id in client_ids %}
-                            <option value="{{ client_id }}">{{ client_id }}</option>
+                            {% for client in client_ids %}
+                            <option value="{{ client }}">{{ client }} - {{ client_names[client] }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-client-name">Client Name</label>
+                        <input type="text" class="form-control" id="edit-client-name" name="client_name" readonly>
                     </div>
                     <div class="form-group">
                         <label for="edit-address">Address</label>
@@ -185,21 +189,11 @@
                     </div>
                     <div class="form-group">
                         <label for="edit-city">City</label>
-                        <select class="form-control" id="edit-city" name="city">
-                            <option value="">Select a city</option>
-                            {% for city in cities %}
-                            <option value="{{ city }}">{{ city }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="text" class="form-control" id="edit-city" name="city">
                     </div>
                     <div class="form-group">
                         <label for="edit-state">State</label>
-                        <select class="form-control" id="edit-state" name="state">
-                            <option value="">Select a state</option>
-                            {% for state in states %}
-                            <option value="{{ state }}">{{ state }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="text" class="form-control" id="edit-state" name="state">
                     </div>
                     <div class="form-group">
                         <label for="edit-zip-code">Zip Code</label>
@@ -220,13 +214,13 @@
                     </div>
                     <div class="form-group">
                         <label for="edit-price">Price</label>
-                        <input type="number" class="form-control" id="edit-price" name="price">
+                        <input type="number" step="0.01" class="form-control" id="edit-price" name="price">
                     </div>
                     <div class="form-group">
                         <label for="edit-shown-date">Shown Date</label>
                         <input type="date" class="form-control" id="edit-shown-date" name="shown_date">
                     </div>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
@@ -290,6 +284,20 @@
                 modal.find('#edit-house-size').val(houseSize);
                 modal.find('#edit-price').val(price);
                 modal.find('#edit-shown-date').val(shownDate);
+            });
+
+            $('#editPropertyModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var propertyId = button.data('property-id');
+            var clientId = button.data('client-id');
+            var clientName = button.data('client-name');
+            // Other data attributes
+
+            var modal = $(this);
+            modal.find('#edit-property-id').val(propertyId);
+            modal.find('#edit-client-id').val(clientId);
+            modal.find('#edit-client-name').val(clientName);
+            // Populate other fields
             });
 
             $('#edit-property-form').on('submit', function(event) {
