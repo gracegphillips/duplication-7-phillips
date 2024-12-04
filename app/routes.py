@@ -20,3 +20,4 @@ def properties():
 @app.route('/visuals')
 def visuals():
     return render_template('visuals.html')
+

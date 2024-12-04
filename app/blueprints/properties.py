@@ -36,10 +36,9 @@ def show_properties():
         df = pd.DataFrame(filtered_properties, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date'])
 
     df['Actions'] = df['property_id'].apply(lambda id:
-        f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editPropertyModal" data-property-id="{id}">Edit</button> '
-        f'<form action="{url_for("properties.delete_property_data", property_id=id)}" method="post" style="display:inline;">'
-        f'<button type="submit" class="btn btn-sm btn-danger">Delete</button></form>'
-    )
+    f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editPropertyModal" data-property-id="{id}">Edit</button> '
+    f'<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deletePropertyModal" data-property-id="{id}">Delete</button>'
+)
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 

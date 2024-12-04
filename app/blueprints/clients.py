@@ -32,10 +32,9 @@ def show_clients():
         df = pd.DataFrame(filtered_clients, columns=['client_id', 'name', 'email', 'phone'])
 
     df['Actions'] = df['client_id'].apply(lambda id:
-        f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editClientModal" data-client-id="{id}" data-client-name="{df.loc[df["client_id"] == id, "name"].values[0]}" data-client-email="{df.loc[df["client_id"] == id, "email"].values[0]}" data-client-phone="{df.loc[df["client_id"] == id, "phone"].values[0]}">Edit</button> '
-        f'<form action="{url_for("clients.delete_client_data", client_id=id)}" method="post" style="display:inline;">'
-        f'<button type="submit" class="btn btn-sm btn-danger">Delete</button></form>'
-    )
+    f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editClientModal" data-client-id="{id}">Edit</button> '
+    f'<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteClientModal" data-client-id="{id}">Delete</button>'
+)
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
@@ -76,6 +75,7 @@ def edit_client_data():
     flash("Client data updated successfully!", "success")
     return redirect(url_for('clients.show_clients'))
 
+
 @clients.route('/delete_client_data/<int:client_id>', methods=['POST'])
 def delete_client_data(client_id):
     connection = get_db()
@@ -85,5 +85,6 @@ def delete_client_data(client_id):
     connection.commit()
     flash("Client data deleted successfully!", "success")
     return redirect(url_for('clients.show_clients'))
+
 
 
