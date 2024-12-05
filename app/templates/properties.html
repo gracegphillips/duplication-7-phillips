@@ -88,74 +88,73 @@
         </table>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="addPropertyModal" tabindex="-1" role="dialog" aria-labelledby="addPropertyModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addPropertyModalLabel">Add New Property</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form method="POST" action="{{ url_for('properties.add_property_data') }}">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="client_id">Client ID</label>
-                            <select class="form-control" id="client_id" name="client_id" required>
-                                <option value="">Select a client ID</option>
-                                {% for client_id in client_ids %}
-                                <option value="{{ client_id }}">{{ client_id }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="address">Address</label>
-                            <input type="text" class="form-control" id="address" name="address" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="city">City</label>
-                            <input type="text" class="form-control" id="city" name="city">
-                        </div>
-                        <div class="form-group">
-                            <label for="state">State</label>
-                            <input type="text" class="form-control" id="state" name="state">
-                        </div>
-                        <div class="form-group">
-                            <label for="zip_code">Zip Code</label>
-                            <input type="text" class="form-control" id="zip_code" name="zip_code">
-                        </div>
-                        <div class="form-group">
-                            <label for="property_type">Property Type</label>
-                            <select class="form-control" id="property_type" name="property_type" required>
-                                <option value="House">House</option>
-                                <option value="Apartment">Apartment</option>
-                                <option value="Commercial">Commercial</option>
-                                <option value="Land">Land</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="house_size">House Size (sq ft)</label>
-                            <input type="number" class="form-control" id="house_size" name="house_size">
-                        </div>
-                        <div class="form-group">
-                            <label for="price">Price</label>
-                            <input type="number" step="0.01" class="form-control" id="price" name="price">
-                        </div>
-                        <div class="form-group">
-                            <label for="shown_date">Shown Date</label>
-                            <input type="date" class="form-control" id="shown_date" name="shown_date">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add Property</button>
-                    </div>
-                </form>
+<!-- Add New Property Modal -->
+<div class="modal fade" id="addPropertyModal" tabindex="-1" role="dialog" aria-labelledby="addPropertyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPropertyModalLabel">Add New Property</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <form method="POST" action="{{ url_for('properties.add_property_data') }}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="client_id">Client ID and Name</label>
+                        <select class="form-control" id="client_id" name="client_id" required>
+                            <option value="">Select a client ID and Name</option>
+                            {% for client in clients %}
+                            <option value="{{ client.client_id }}">{{ client.client_id }} - {{ client.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" class="form-control" id="state" name="state" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="zip_code">Zip Code</label>
+                        <input type="text" class="form-control" id="zip_code" name="zip_code" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="property_type">Property Type</label>
+                        <select class="form-control" id="property_type" name="property_type" required>
+                            <option value="House">House</option>
+                            <option value="Apartment">Apartment</option>
+                            <option value="Commercial">Commercial</option>
+                            <option value="Land">Land</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="house_size">House Size (sq ft)</label>
+                        <input type="number" class="form-control" id="house_size" name="house_size" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shown_date">Shown Date</label>
+                        <input type="date" class="form-control" id="shown_date" name="shown_date" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Property</button>
+                </div>
+            </form>
         </div>
     </div>
-
+</div>
 
 
 <!-- Edit Property Modal -->
@@ -286,18 +285,19 @@
                 modal.find('#edit-shown-date').val(shownDate);
             });
 
-            $('#editPropertyModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var propertyId = button.data('property-id');
-            var clientId = button.data('client-id');
-            var clientName = button.data('client-name');
-            // Other data attributes
 
-            var modal = $(this);
-            modal.find('#edit-property-id').val(propertyId);
-            modal.find('#edit-client-id').val(clientId);
-            modal.find('#edit-client-name').val(clientName);
-            // Populate other fields
+            $('#editPropertyModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var propertyId = button.data('property-id');
+                var clientId = button.data('client-id');
+                var clientName = button.data('client-name');
+                // Other data attributes
+
+                var modal = $(this);
+                modal.find('#edit-property-id').val(propertyId);
+                modal.find('#edit-client-id').val(clientId);
+                modal.find('#edit-client-name').val(clientName);
+                // Populate other fields
             });
 
             $('#edit-property-form').on('submit', function(event) {
@@ -313,6 +313,21 @@
                 form.attr('action', '/delete_property_data/' + propertyId);
                 form.find('#delete-property-id').val(propertyId);
             });
+
+            $('#delete-property-form').on('submit', function(event) {
+                event.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function(response) {
+                        location.reload();
+                    }
+                });
+            });
         });
     </script>
+
+
 {% endblock %}

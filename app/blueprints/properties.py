@@ -52,7 +52,14 @@ def show_properties():
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
-    return render_template("properties.html", table=rows_only, client_ids=client_ids, client_names=client_names, cities=cities, states=states)
+    # Retrieve list of client IDs and names for the dropdown
+    query = "SELECT client_id, name FROM clients"
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        clients = cursor.fetchall()
+
+    return render_template("properties.html", table=rows_only, client_ids=client_ids, client_names=client_names, cities=cities, states=states, clients=clients)
+
 
 @properties.route('/add_property_data', methods=['GET', 'POST'])
 def add_property_data():
@@ -75,13 +82,14 @@ def add_property_data():
         flash("New property data added successfully!", "success")
         return redirect(url_for('properties.show_properties'))
 
-    # Retrieve list of client IDs
-    query = "SELECT client_id FROM clients"
+    # Retrieve list of client IDs and names
+    query = "SELECT client_id, name FROM clients"
     with connection.cursor() as cursor:
         cursor.execute(query)
-        client_ids = [row['client_id'] for row in cursor.fetchall()]
+        clients = cursor.fetchall()
 
-    return render_template("add_property_data.html", client_ids=client_ids)
+    return render_template("properties.html", clients=clients)
+
 
 
 
