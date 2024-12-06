@@ -166,60 +166,60 @@
     <script>
         $(document).ready(function() {
             $('#data-table').DataTable({
-                "paging": true,
-                "ordering": true,
-                "info": true,
-                "searching": true
-            });
+            "paging": true,
+            "ordering": true,
+            "info": true,
+            "searching": true
+        });
 
-           $('#editClientModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var clientId = button.data('client-id');
-                var clientName = button.data('client-name');
-                var clientEmail = button.data('client-email');
-                var clientPhone = button.data('client-phone');
-                // Other data attributes
+        $('#editClientModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var clientId = button.data('client-id');
 
-                var modal = $(this);
-                modal.find('#edit-client-id').val(clientId);
-                modal.find('#edit-client-name').val(clientName);
-                modal.find('#edit-client-email').val(clientEmail);
-                modal.find('#edit-client-phone').val(clientPhone);
-                // Populate other fields
-           });
-
-
-           $('#edit-client-form').on('submit', function(event) {
-                event.preventDefault();
-                // Add your form submission logic here
-                $('#editClientModal').modal('hide');
-           });
-
-
-
-
-            $('#deleteClientModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var clientId = button.data('client-id');
-                 var form = $('#delete-client-form');
-                form.attr('action', '/delete_client_data/' + clientId);
-                form.find('#delete-client-id').val(clientId);
-            });
-
-            $('#delete-client-form').on('submit', function(event) {
-                event.preventDefault();
-                var form = $(this);
-                $.ajax({
-                    type: form.attr('method'),
-                    url: form.attr('action'),
-                    data: form.serialize(),
-                    success: function(response) {
-                        location.reload();
-                    }
-                });
-
+            $.ajax({
+                url: '/edit_client_data/' + clientId,
+                type: 'GET',
+                success: function(data) {
+                    var modal = $('#editClientModal');
+                    modal.find('#edit-client-id').val(data.client_id);
+                    modal.find('#edit-client-name').val(data.name);
+                    modal.find('#edit-client-email').val(data.email);
+                    modal.find('#edit-client-phone').val(data.phone);
+                },
+                error: function() {
+                    alert('Failed to retrieve client data.');
+                }
             });
         });
-    </script>
+
+        $('#edit-client-form').on('submit', function(event) {
+            event.preventDefault();
+            // Add your form submission logic here
+            $('#editClientModal').modal('hide');
+        });
+
+        $('#deleteClientModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var clientId = button.data('client-id');
+            var form = $('#delete-client-form');
+            form.attr('action', '/delete_client_data/' + clientId);
+            form.find('#delete-client-id').val(clientId);
+        });
+
+        $('#delete-client-form').on('submit', function(event) {
+            event.preventDefault();
+            var form = $(this);
+            $.ajax({
+                type: form.attr('method'),
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function(response) {
+                    location.reload();
+                }
+            });
+        });
+    });
+
+</script>
 
 {% endblock %}
