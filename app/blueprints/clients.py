@@ -60,20 +60,30 @@ def add_client_data():
     return render_template("add_client_data.html")
 
 
-@clients.route('/edit_client_data', methods=['POST'])
-def edit_client_data():
-    client_id = request.form['client_id']
-    name = request.form['name']
-    email = request.form['email']
-    phone = request.form['phone']
-
+@clients.route('/edit_client_data/<int:client_id>', methods=['GET', 'POST'])
+def edit_client_data(client_id):
     connection = get_db()
-    query = "UPDATE clients SET name = %s, email = %s, phone = %s WHERE client_id = %s"
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        phone = request.form['phone']
+        # Add other fields as necessary
+
+        query = "UPDATE clients SET name = %s, email = %s, phone = %s WHERE client_id = %s"
+        with connection.cursor() as cursor:
+            cursor.execute(query, (name, email, phone, client_id))
+        connection.commit()
+        flash("Client data updated successfully!", "success")
+        return redirect(url_for('clients.show_clients'))
+
+    query = "SELECT * FROM clients WHERE client_id = %s"
     with connection.cursor() as cursor:
-        cursor.execute(query, (name, email, phone, client_id))
-    connection.commit()
-    flash("Client data updated successfully!", "success")
-    return redirect(url_for('clients.show_clients'))
+        cursor.execute(query, (client_id,))
+        client_data = cursor.fetchone()
+
+    return render_template("edit_client_data.html", client_data=client_data)
+
+
 
 @clients.route('/delete_client_data/<int:client_id>', methods=['POST'])
 def delete_client_data(client_id):

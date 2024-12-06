@@ -98,40 +98,39 @@
         </div>
     </div>
 
-    <!-- Edit Client Modal -->
-    <div class="modal fade" id="editClientModal" tabindex="-1" role="dialog" aria-labelledby="editClientModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editClientModalLabel">Edit Client</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form method="POST" action="{{ url_for('clients.edit_client_data') }}">
-                    <div class="modal-body">
-                        <input type="hidden" id="edit-client-id" name="client_id">
-                        <div class="form-group">
-                            <label for="edit-name">Name</label>
-                            <input type="text" class="form-control" id="edit-name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-email">Email Address</label>
-                            <input type="email" class="form-control" id="edit-email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-phone">Phone</label>
-                            <input type="text" class="form-control" id="edit-phone" name="phone" required>
-                        </div>
+<!-- Edit Client Modal -->
+<div class="modal fade" id="editClientModal" tabindex="-1" role="dialog" aria-labelledby="editClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editClientModalLabel">Edit Client</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-client-form" method="POST" action="">
+                    <input type="hidden" id="edit-client-id" name="client_id">
+                    <div class="form-group">
+                        <label for="edit-client-name">Name</label>
+                        <input type="text" class="form-control" id="edit-client-name" name="name" required>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    <div class="form-group">
+                        <label for="edit-client-email">Email</label>
+                        <input type="email" class="form-control" id="edit-client-email" name="email" required>
                     </div>
+                    <div class="form-group">
+                        <label for="edit-client-phone">Phone</label>
+                        <input type="text" class="form-control" id="edit-client-phone" name="phone" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
     </div>
+</div>
+
+
 
 <!-- Delete Client Modal -->
 <div class="modal fade" id="deleteClientModal" tabindex="-1" role="dialog" aria-labelledby="deleteClientModalLabel" aria-hidden="true">
@@ -158,8 +157,6 @@
 </div>
 
 
-
-
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 {% endblock %}
 
@@ -175,26 +172,38 @@
                 "searching": true
             });
 
-            $('#editClientModal').on('show.bs.modal', function (event) {
+           $('#editClientModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
                 var clientId = button.data('client-id');
                 var clientName = button.data('client-name');
                 var clientEmail = button.data('client-email');
                 var clientPhone = button.data('client-phone');
+                // Other data attributes
 
                 var modal = $(this);
                 modal.find('#edit-client-id').val(clientId);
-                modal.find('#edit-name').val(clientName);
-                modal.find('#edit-email').val(clientEmail);
-                modal.find('#edit-phone').val(clientPhone);
-            });
+                modal.find('#edit-client-name').val(clientName);
+                modal.find('#edit-client-email').val(clientEmail);
+                modal.find('#edit-client-phone').val(clientPhone);
+                // Populate other fields
+           });
+
+
+           $('#edit-client-form').on('submit', function(event) {
+                event.preventDefault();
+                // Add your form submission logic here
+                $('#editClientModal').modal('hide');
+           });
+
+
+
 
             $('#deleteClientModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var clientId = button.data('client-id');
-            var form = $('#delete-client-form');
-            form.attr('action', '/delete_client_data/' + clientId);
-            form.find('#delete-client-id').val(clientId);
+                var button = $(event.relatedTarget);
+                var clientId = button.data('client-id');
+                 var form = $('#delete-client-form');
+                form.attr('action', '/delete_client_data/' + clientId);
+                form.find('#delete-client-id').val(clientId);
             });
 
             $('#delete-client-form').on('submit', function(event) {
@@ -209,7 +218,8 @@
                     }
                 });
 
-         });
+            });
+        });
     </script>
 
 {% endblock %}
