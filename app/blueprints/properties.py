@@ -116,8 +116,8 @@ def edit_property_data(property_id):
 
     query = "SELECT * FROM properties_shown WHERE property_id = %s"
     with connection.cursor() as cursor:
-        cursor.execute(query, (property_id,))
-        property_data = cursor.fetchone()
+            cursor.execute(query, (property_id,))
+            property_data = cursor.fetchone()
 
     return render_template("edit_property_data.html", property_data=property_data)
 
