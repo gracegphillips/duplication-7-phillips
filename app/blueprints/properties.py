@@ -121,6 +121,8 @@ def edit_property_data(property_id):
 
     return render_template("edit_property_data.html", property_data=property_data)
 
+
+
 @properties.route('/delete_property_data/<int:property_id>', methods=['POST'])
 def delete_property_data(property_id):
     connection = get_db()

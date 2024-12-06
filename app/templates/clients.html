@@ -101,6 +101,8 @@
         </div>
     </div>
 
+
+
 <!-- Edit Client Modal -->
 <div class="modal fade" id="editClientModal" tabindex="-1" role="dialog" aria-labelledby="editClientModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -116,15 +118,15 @@
                     <input type="hidden" id="edit-client-id" name="client_id">
                     <div class="form-group">
                         <label for="edit-client-name">Name</label>
-                        <input type="text" class="form-control" id="edit-client-name" name="name" required>
+                        <input type="text" class="form-control" id="edit-client-name" name="edit_client_name" required>
                     </div>
                     <div class="form-group">
                         <label for="edit-client-email">Email</label>
-                        <input type="email" class="form-control" id="edit-client-email" name="email" required>
+                        <input type="email" class="form-control" id="edit-client-email" name="edit_client_email" required>
                     </div>
                     <div class="form-group">
                         <label for="edit-client-phone">Phone</label>
-                        <input type="text" class="form-control" id="edit-client-phone" name="phone" required>
+                        <input type="text" class="form-control" id="edit-client-phone" name="edit_client_phone" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
@@ -186,20 +188,34 @@
                 var clientName = button.data('client-name');
                 var clientEmail = button.data('client-email');
                 var clientPhone = button.data('client-phone');
-                // Other data attributes
+
 
                 var modal = $(this);
                 modal.find('#edit-client-id').val(clientId);
                 modal.find('#edit-client-name').val(clientName);
                 modal.find('#edit-client-email').val(clientEmail);
                 modal.find('#edit-client-phone').val(clientPhone);
-                 // Populate other fields
             });
 
             $('#edit-client-form').on('submit', function(event) {
                 event.preventDefault();
                 // Add your form submission logic here
                 $('#editClientModal').modal('hide');
+            });
+
+
+
+            $('#edit-client-form').on('submit', function(event) {
+                event.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function(response) {
+                        location.reload();
+                    }
+                });
             });
 
             $('#deleteClientModal').on('show.bs.modal', function (event) {

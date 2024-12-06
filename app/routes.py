@@ -21,3 +21,4 @@ def properties():
 def visuals():
     return render_template('visuals.html')
 
+

@@ -31,10 +31,10 @@ def show_clients():
         filtered_clients = filter_by_name(result, name=name, email=email, phone=phone)
         df = pd.DataFrame(filtered_clients, columns=['client_id', 'name', 'email', 'phone'])
 
-    df['Actions'] = df['client_id'].apply(lambda id:
-    f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editClientModal" data-client-id="{id}">Edit</button> '
-    f'<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteClientModal" data-client-id="{id}">Delete</button>'
-)
+    df['Actions'] = df.apply(lambda row:
+        f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editClientModal" data-client-id="{row["client_id"]}" data-client-name="{row["name"]}" data-client-email="{row["email"]}" data-client-phone="{row["phone"]}">Edit</button> '
+        f'<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteClientModal" data-client-id="{row["client_id"]}">Delete</button>', axis=1
+    )
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
