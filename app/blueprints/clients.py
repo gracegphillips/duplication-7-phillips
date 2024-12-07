@@ -31,16 +31,9 @@ def show_clients():
         filtered_clients = filter_by_name(result, name=name, email=email, phone=phone)
         df = pd.DataFrame(filtered_clients, columns=['client_id', 'name', 'email', 'phone'])
 
-    df['Actions'] = df.apply(lambda row:
-        f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editClientModal" data-client-id="{row["client_id"]}" data-client-name="{row["name"]}" data-client-email="{row["email"]}" data-client-phone="{row["phone"]}">Edit</button> '
-        f'<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteClientModal" data-client-id="{row["client_id"]}">Delete</button>', axis=1
-    )
-    table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
-    rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
+    all_clients = df.to_dict(orient='records')
 
-    return render_template("clients.html", table=rows_only, client_names=client_names, client_emails=client_emails, client_phones=client_phones)
-
-
+    return render_template("clients.html", all_clients=all_clients, client_names=client_names, client_emails=client_emails, client_phones=client_phones)
 
 @clients.route('/add_client_data', methods=['GET', 'POST'])
 def add_client_data():
@@ -59,15 +52,13 @@ def add_client_data():
 
     return render_template("add_client_data.html")
 
-
-@clients.route('/edit_client_data/<int:client_id>', methods=['GET', 'POST'])
+@clients.route('/edit_client_data/<int:client_id>', methods=['POST'])
 def edit_client_data(client_id):
     connection = get_db()
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone']
-        # Add other fields as necessary
 
         query = "UPDATE clients SET name = %s, email = %s, phone = %s WHERE client_id = %s"
         with connection.cursor() as cursor:
@@ -75,14 +66,6 @@ def edit_client_data(client_id):
         connection.commit()
         flash("Client data updated successfully!", "success")
         return redirect(url_for('clients.show_clients'))
-
-    query = "SELECT * FROM clients WHERE client_id = %s"
-    with connection.cursor() as cursor:
-        cursor.execute(query, (client_id,))
-        client_data = cursor.fetchone()
-
-    return render_template("edit_client_data.html", client_data=client_data)
-
 
 
 @clients.route('/delete_client_data/<int:client_id>', methods=['POST'])
@@ -94,6 +77,3 @@ def delete_client_data(client_id):
     connection.commit()
     flash("Client data deleted successfully!", "success")
     return redirect(url_for('clients.show_clients'))
-
-
-

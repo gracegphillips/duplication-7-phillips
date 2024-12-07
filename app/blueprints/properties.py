@@ -4,6 +4,7 @@ import pandas as pd
 from ..functions import filter_properties
 
 
+
 properties = Blueprint('properties', __name__)
 
 
@@ -18,6 +19,7 @@ def show_properties():
     with connection.cursor() as cursor:
         cursor.execute(query)
         result = cursor.fetchall()
+
     df = pd.DataFrame(result, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date', 'client_name'])
 
     # Retrieve list of client IDs, cities, and states
@@ -45,10 +47,6 @@ def show_properties():
         filtered_properties = filter_properties(result, min_size=min_size, max_size=max_size, min_price=min_price, max_price=max_price, client_id=client_id, city=city, state=state)
         df = pd.DataFrame(filtered_properties, columns=['property_id', 'client_id', 'address', 'city', 'state', 'zip_code', 'property_type', 'house_size', 'price', 'shown_date', 'client_name'])
 
-    df['Actions'] = df.apply(lambda row:
-        f'<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editPropertyModal" data-property-id="{row["property_id"]}" data-client-id="{row["client_id"]}" data-client-name="{row["client_name"]}" data-address="{row["address"]}" data-city="{row["city"]}" data-state="{row["state"]}" data-zip-code="{row["zip_code"]}" data-property-type="{row["property_type"]}" data-house-size="{row["house_size"]}" data-price="{row["price"]}" data-shown-date="{row["shown_date"]}">Edit</button> '
-        f'<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deletePropertyModal" data-property-id="{row["property_id"]}">Delete</button>', axis=1
-    )
     table_html = df.to_html(classes='dataframe table table-striped table-bordered', index=False, header=False, escape=False)
     rows_only = table_html.split('<tbody>')[1].split('</tbody>')[0]
 
@@ -58,7 +56,8 @@ def show_properties():
         cursor.execute(query)
         clients = cursor.fetchall()
 
-    return render_template("properties.html", table=rows_only, client_ids=client_ids, client_names=client_names, cities=cities, states=states, clients=clients)
+    return render_template("properties.html", table=rows_only, client_ids=client_ids, client_names=client_names, cities=cities, states=states, clients=clients, all_properties=df.to_dict(orient='records'))
+
 
 
 @properties.route('/add_property_data', methods=['GET', 'POST'])
@@ -91,11 +90,10 @@ def add_property_data():
     return render_template("properties.html", clients=clients)
 
 
-
-
 @properties.route('/edit_property_data/<int:property_id>', methods=['GET', 'POST'])
 def edit_property_data(property_id):
     connection = get_db()
+
     if request.method == 'POST':
         client_id = request.form['client_id']
         address = request.form['address']
@@ -107,20 +105,34 @@ def edit_property_data(property_id):
         price = request.form['price']
         shown_date = request.form['shown_date']
 
-        query = "UPDATE properties_shown SET client_id = %s, address = %s, city = %s, state = %s, zip_code = %s, property_type = %s, house_size = %s, price = %s, shown_date = %s WHERE property_id = %s"
+        # Update query to update property details
+        query = """
+        UPDATE properties_shown 
+        SET client_id = %s, address = %s, city = %s, state = %s, zip_code = %s, 
+            property_type = %s, house_size = %s, price = %s, shown_date = %s 
+        WHERE property_id = %s
+        """
         with connection.cursor() as cursor:
-            cursor.execute(query, (client_id, address, city, state, zip_code, property_type, house_size, price, shown_date, property_id))
+            cursor.execute(query, (
+                client_id, address, city, state, zip_code, property_type, house_size, price, shown_date, property_id))
         connection.commit()
         flash("Property data updated successfully!", "success")
         return redirect(url_for('properties.show_properties'))
 
-    query = "SELECT * FROM properties_shown WHERE property_id = %s"
+    # Query to get property details along with associated client data (client_id and client_name)
+    query = """
+    SELECT p.*, c.client_id, c.client_name
+    FROM properties_shown p
+    JOIN clients c ON p.client_id = c.client_id
+    WHERE p.property_id = %s
+    """
     with connection.cursor() as cursor:
-            cursor.execute(query, (property_id,))
-            property_data = cursor.fetchone()
+        cursor.execute(query, (property_id,))
+        property_data = cursor.fetchone()
 
-    return render_template("edit_property_data.html", property_data=property_data)
-
+    # Pass the property data along with client information to the template
+    return render_template("edit_property_data.html", property_data=property_data, client_id=property_data['client_id'],
+                           client_name=property_data['client_name'])
 
 
 @properties.route('/delete_property_data/<int:property_id>', methods=['POST'])
@@ -132,4 +144,3 @@ def delete_property_data(property_id):
     connection.commit()
     flash("Property data deleted successfully!", "success")
     return redirect(url_for('properties.show_properties'))
-
