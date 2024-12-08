@@ -196,6 +196,7 @@
     </table>
 </div>
 
+
 <!-- Add Property Modal -->
 <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -206,10 +207,17 @@
             </div>
             <form method="post" action="{{ url_for('properties.add_property_data') }}">
                 <div class="modal-body">
+                    <!-- Client Dropdown -->
                     <div class="mb-3">
-                        <label class="form-label">Client ID</label>
-                        <input type="number" class="form-control" name="client_id" required>
+                        <label for="client_id" class="form-label">Select Client</label>
+                        <select class="form-select" name="client_id" id="client_id" required>
+                            <option value="" disabled selected>Select a client</option>
+                            {% for client in clients %}
+                                <option value="{{ client.client_id }}">{{ client.client_id }} - {{ client.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
+                    <!-- Other Fields -->
                     <div class="mb-3">
                         <label class="form-label">Address</label>
                         <input type="text" class="form-control" name="address" required>
@@ -256,6 +264,9 @@
         </div>
     </div>
 </div>
+
+
+
 
 
 
