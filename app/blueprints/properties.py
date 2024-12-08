@@ -95,6 +95,7 @@ def edit_property_data(property_id):
     connection = get_db()
 
     if request.method == 'POST':
+        # Retrieve form data
         client_id = request.form['client_id']
         address = request.form['address']
         city = request.form['city']
@@ -105,34 +106,43 @@ def edit_property_data(property_id):
         price = request.form['price']
         shown_date = request.form['shown_date']
 
-        # Update query to update property details
-        query = """
-        UPDATE properties_shown 
-        SET client_id = %s, address = %s, city = %s, state = %s, zip_code = %s, 
-            property_type = %s, house_size = %s, price = %s, shown_date = %s 
+        # Update query for the property
+        update_query = """
+        UPDATE properties_shown
+        SET client_id = %s, address = %s, city = %s, state = %s, zip_code = %s,
+            property_type = %s, house_size = %s, price = %s, shown_date = %s
         WHERE property_id = %s
         """
-        with connection.cursor() as cursor:
-            cursor.execute(query, (
-                client_id, address, city, state, zip_code, property_type, house_size, price, shown_date, property_id))
-        connection.commit()
-        flash("Property data updated successfully!", "success")
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(update_query, (
+                    client_id, address, city, state, zip_code,
+                    property_type, house_size, price, shown_date, property_id
+                ))
+            connection.commit()
+            flash("Property updated successfully!", "success")
+        except Exception as e:
+            flash(f"Error updating property: {str(e)}", "danger")
+            connection.rollback()
+
         return redirect(url_for('properties.show_properties'))
 
-    # Query to get property details along with associated client data (client_id and client_name)
-    query = """
-    SELECT p.*, c.client_id, c.client_name
+    # Fetch property details for the edit form
+    select_query = """
+    SELECT p.*, c.name AS client_name
     FROM properties_shown p
     JOIN clients c ON p.client_id = c.client_id
     WHERE p.property_id = %s
     """
     with connection.cursor() as cursor:
-        cursor.execute(query, (property_id,))
+        cursor.execute(select_query, (property_id,))
         property_data = cursor.fetchone()
 
-    # Pass the property data along with client information to the template
-    return render_template("edit_property_data.html", property_data=property_data, client_id=property_data['client_id'],
-                           client_name=property_data['client_name'])
+    if not property_data:
+        flash("Property not found.", "warning")
+        return redirect(url_for('properties.show_properties'))
+
+    return render_template("edit_property_modal.html", property=property_data)
 
 
 @properties.route('/delete_property_data/<int:property_id>', methods=['POST'])
