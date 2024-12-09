@@ -17,8 +17,8 @@ def clients():
 def properties():
     return render_template('properties.html')
 
-@app.route('/visuals')
-def visuals():
-    return render_template('visuals.html')
+@app.route('/client_data_visualization')
+def client_data_visualization():
+    return render_template('client_data_visualization.html')
 
 

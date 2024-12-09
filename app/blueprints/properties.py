@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import io
+import base64
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.db_connect import get_db
 import pandas as pd
@@ -57,6 +60,56 @@ def show_properties():
         clients = cursor.fetchall()
 
     return render_template("properties.html", table=rows_only, client_ids=client_ids, client_names=client_names, cities=cities, states=states, clients=clients, all_properties=df.to_dict(orient='records'))
+
+
+
+
+@properties.route('/client_data_visualization')
+def client_data_visualization():
+    connection = get_db()
+    query = """
+    SELECT p.city, p.state, COUNT(c.client_id) as client_count
+    FROM properties_shown p
+    JOIN clients c ON p.client_id = c.client_id
+    GROUP BY p.city, p.state
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    df = pd.DataFrame(result, columns=['city', 'state', 'client_count'])
+
+    # Plot number of clients per city
+    plt.figure(figsize=(10, 6))
+    df_city = df.groupby('city')['client_count'].sum().sort_values(ascending=False)
+    df_city.plot(kind='bar')
+    plt.title('Number of Clients per City')
+    plt.xlabel('City')
+    plt.ylabel('Number of Clients')
+    plt.tight_layout()
+
+    img_city = io.BytesIO()
+    plt.savefig(img_city, format='png')
+    img_city.seek(0)
+    plot_url_city = base64.b64encode(img_city.getvalue()).decode()
+
+    # Plot number of clients per state
+    plt.figure(figsize=(10, 6))
+    df_state = df.groupby('state')['client_count'].sum().sort_values(ascending=False)
+    df_state.plot(kind='bar')
+    plt.title('Number of Clients per State')
+    plt.xlabel('State')
+    plt.ylabel('Number of Clients')
+    plt.tight_layout()
+
+    img_state = io.BytesIO()
+    plt.savefig(img_state, format='png')
+    img_state.seek(0)
+    plot_url_state = base64.b64encode(img_state.getvalue()).decode()
+
+    return render_template("client_data_visualization.html", plot_url_city=plot_url_city, plot_url_state=plot_url_state)
+
+
 
 
 
